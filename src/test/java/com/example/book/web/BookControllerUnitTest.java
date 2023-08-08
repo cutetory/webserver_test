@@ -95,4 +95,21 @@ public class BookControllerUnitTest {
             .andExpect(jsonPath("$.[0].title").value("테스트1"))
             .andDo(MockMvcResultHandlers.print());
     }
+
+    @Test
+    public void findById_테스트() throws Exception{
+        //given
+        Long id = 1L;
+        when(bookService.한건가져오기(id)).thenReturn(new Book(1L, "테스트1", "작가1"));
+
+        //when
+        ResultActions resultAction = mockMvc.perform(get("/book/{id}", id)
+        .accept(MediaType.APPLICATION_JSON));
+
+        //then
+        resultAction
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.title").value("테스트1"))
+            .andDo(MockMvcResultHandlers.print());
+    }
 }
