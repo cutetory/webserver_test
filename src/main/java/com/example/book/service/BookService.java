@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor //final이 붙은 필드를 인자값으로 하는 생성자를 만들어줌
 @Service
 public class BookService {
+
     private final BookRepository bookRepository;    
     
     @Transactional //함수가 종료될 때 commit할지 rollback할지 트랜잭션 관리하겠다.

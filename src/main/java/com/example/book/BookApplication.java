@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 // import org.springframework.context.ConfigurableApplicationContext;
 
+
 // import com.example.book.domain.Book;
 // import com.example.book.domain.BookRepository;
 
@@ -12,6 +13,7 @@ public class BookApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(BookApplication.class, args);
+
 
 		// ConfigurableApplicationContext context = SpringApplication.run(BookApplication.class, args);
 		// BookRepository bookRepository = context.getBean(BookRepository.class);
