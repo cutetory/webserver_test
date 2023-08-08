@@ -12,14 +12,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.mockito.Mockito.when;
+// import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+// import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,20 +55,20 @@ public class BookControllerIntegreTest {
     @Autowired
     private MockMvc mockMvc;
 
-    //findAll 테스트할 때 데이터 아무것도 없어서
+    // findAll 테스트할 때 데이터 아무것도 없어서
     @Autowired
     private BookRepository bookRepository;
 
-    //전체 실행할 때 오토인크레멘트 처리때문에
+    // 전체 실행할 때 오토인크레멘트 처리때문에
     @Autowired
     private EntityManager entityManager;
 
-    //전체 실행할 때 오토인크레멘트 처리때문에
+    // 전체 실행할 때 오토인크레멘트 처리때문에
     @BeforeEach
-    public void init()
-    {
-        entityManager.createNativeQuery("ALTER TABLE book ALTER COLUMN id RESTART WITH 1").executeUpdate();//h2 sql 쿼리
+    public void init() {
+        entityManager.createNativeQuery("ALTER TABLE book ALTER COLUMN id RESTART WITH 1").executeUpdate();// h2 sql 쿼리
     }
+    // BeforeEach와 AfterEach 만들어서 진행!!
 
     // BDDMockito 패턴 given, when, then
     @Test
@@ -114,4 +120,79 @@ public class BookControllerIntegreTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
+    @Test
+    public void findById_테스트() throws Exception {
+        // given
+        List<Book> books = new ArrayList<>();
+        books.add(new Book(null, "테스트1", "작가1"));
+        books.add(new Book(null, "테스트2", "작가2"));
+        books.add(new Book(null, "테스트3", "작가3"));
+        // when(bookService.모두가져오기()).thenReturn(books);
+        bookRepository.saveAll(books);
+
+        Long id = 1L;
+        // when(bookService.한건가져오기(id)).thenReturn(new Book(1L, "테스트1", "작가1"));
+
+        // when
+        ResultActions resultAction = mockMvc.perform(get("/book/{id}", id)
+                .accept(MediaType.APPLICATION_JSON));
+
+        // then
+        resultAction
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("테스트1"))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void update_테스트() throws Exception {
+        // given
+        List<Book> books = new ArrayList<>();
+        books.add(new Book(null, "테스트1", "작가1"));
+        books.add(new Book(null, "테스트2", "작가2"));
+        books.add(new Book(null, "테스트3", "작가3"));
+        // when(bookService.모두가져오기()).thenReturn(books);
+        bookRepository.saveAll(books);
+
+        Long id = 1L;
+        Book book = new Book(null, "수정하기", "책저자");
+        String content = new ObjectMapper().writeValueAsString(book);
+        // when(bookService.수정하기(id, book)).thenReturn(new Book(1L, "수정하기", "작가1"));
+
+        // when (테스트 실행)
+        ResultActions resultAction = mockMvc.perform(put("/book/{id}", id).contentType(MediaType.APPLICATION_JSON)
+                .content(content)
+                .accept(MediaType.APPLICATION_JSON));
+
+        // then
+        resultAction
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("수정하기"))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void delete_테스트() throws Exception {
+        // given
+        Long id = 1L;
+        List<Book> books = new ArrayList<>();
+        books.add(new Book(null, "테스트1", "작가1"));
+        books.add(new Book(null, "테스트2", "작가2"));
+        books.add(new Book(null, "테스트3", "작가3"));
+        // when(bookService.모두가져오기()).thenReturn(books);
+        bookRepository.saveAll(books);
+        // when(bookService.삭제하기(id)).thenReturn("ok");
+
+        // when (테스트 실행)
+        ResultActions resultAction = mockMvc.perform(delete("/book/{id}", id).accept(MediaType.TEXT_PLAIN));
+
+        // then
+        resultAction
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print());
+            
+        MvcResult requestResult = resultAction.andReturn();
+        String result = requestResult.getResponse().getContentAsString();
+        assertEquals("ok", result);
+    }
 }
