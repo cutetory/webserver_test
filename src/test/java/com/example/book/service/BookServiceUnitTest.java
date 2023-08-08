@@ -1,10 +1,15 @@
 package com.example.book.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.example.book.domain.Book;
 import com.example.book.domain.BookRepository;
 
 //단위 테스트 (Service와 관련된 것들만 메모리에 로딩하면 됨.)
@@ -23,4 +28,23 @@ public class BookServiceUnitTest {
 
     @Mock
     private BookRepository bookRepository;
+
+    @Test
+    public void 저장하기_테스트()
+    {
+        //BOD Mocikto방식
+        //given
+        Book book = new Book();
+        book.setTitle("책제목1");
+        book.setAuthor("책저자1");
+
+        //stub - 동작지정
+        when(bookRepository.save(book)).thenReturn(book);
+
+        //test execute
+        Book bookEntity = bookService.저장하기(book);
+
+        //then
+        assertEquals(bookEntity, book);
+    }
 }
