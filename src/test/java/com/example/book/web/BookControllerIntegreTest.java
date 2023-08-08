@@ -14,6 +14,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.transaction.annotation.Transactional;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 // import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -59,8 +63,10 @@ public class BookControllerIntegreTest {
         //then (검증)
         resultAction
             .andExpect(status().isCreated()) // 201을 기대
-            .andExpect(jsonPath("$.title").value("테스트"))
+            .andExpect(jsonPath("$.title").value("책제목"))
             .andDo(MockMvcResultHandlers.print());
 
     }
+
+
 }

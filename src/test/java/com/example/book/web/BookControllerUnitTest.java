@@ -2,6 +2,7 @@ package com.example.book.web;
 
 import static org.mockito.Mockito.when;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 // import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.http.MediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 // import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
@@ -68,5 +74,25 @@ public class BookControllerUnitTest {
             .andExpect(jsonPath("$.title").value("테스트"))
             .andDo(MockMvcResultHandlers.print());
 
+    }
+
+    @Test
+    public void findAll_테스트() throws Exception{
+        //given
+        List<Book> books = new ArrayList<>();
+        books.add(new Book(1L, "테스트1", "작가1"));
+        books.add(new Book(2L, "테스트2", "작가2"));
+        when(bookService.모두가져오기()).thenReturn(books);
+
+        //when
+        ResultActions resultAction = mockMvc.perform(get("/book")
+        .accept(MediaType.APPLICATION_JSON));
+
+        //then
+        resultAction
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", Matchers.hasSize(2)))
+            .andExpect(jsonPath("$.[0].title").value("테스트1"))
+            .andDo(MockMvcResultHandlers.print());
     }
 }
